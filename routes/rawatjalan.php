@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\RawatjalanController;
+use App\Http\Controllers\RawatJalanController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [RawatjalanController::class, 'index']) ->name('index');
-Route::get('/data', [RawatjalanController::class, 'data'])->name('data');  
-Route::get('/{id}', [RawatjalanController::class, 'detail'])->name('detail');
+Route::get('/', [RawatJalanController::class, 'index']) ->name('index');
+Route::get('/data', [RawatJalanController::class, 'data'])->name('data');  
+Route::get('/{id}', [RawatJalanController::class, 'detail'])->name('detail');

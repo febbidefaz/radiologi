@@ -26,7 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
             Route::middleware(['web', 'cekloginrad'])
                 ->prefix('rad')
-                ->name('rad')
+                ->name('rad.')
                 ->group(base_path('routes/rad.php'));
 
             Route::middleware('web')

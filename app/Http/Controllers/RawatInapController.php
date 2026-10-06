@@ -139,71 +139,88 @@ class RawatInapController extends Controller
     {
         $pasien = DB::selectOne(
             "EXEC dbo.WebPasienRawatInapDetailByID_SP ?",
-            [$id]
+            [(int) $id]
         );
     
         if (!$pasien) {
             abort(404, 'Pasien tidak ditemukan');
         }
     
-        // LAB
-        $lab = DB::select(
-            "EXEC dbo.WeblaboratByIDReg_SP ?",
-            [$id]
+    
+        // ============================================================
+        // RADIOLOGI
+        // ============================================================
+    
+        $rad = DB::select(
+            "EXEC dbo.WebRadiologiByIDReg_SP ?",
+            [(int) $id]
         );
     
-        $labDetail = [];
+        $radDetail = [];
     
-        foreach ($lab as $l) {
-            $labDetail[$l->IDLab] = DB::select(
-                "EXEC dbo.WebLaboratDetailByIDLab_SP ?",
-                [$l->IDLab]
+        foreach ($rad as $r) {
+    
+            $radDetail[$r->IDRad] = DB::select(
+                "EXEC dbo.WebRadiologiDetailByIDRad_SP ?",
+                [(int) $r->IDRad]
             );
         }
     
+    
+        // ============================================================
         // LAIN-LAIN
+        // ============================================================
+    
         $lainlain = DB::select(
             "EXEC dbo.WebLainBillingByID_SP ?",
-            [$id]
+            [(int) $id]
         );
-
+    
+    
+        // ============================================================
+        // DOKTER
+        // ============================================================
+    
         $dokterList = DB::select("
             SET NOCOUNT ON;
             EXEC dbo.cboDokter_SP
         ");
 
-        $dokterSpPKList = DB::select("
+        $alatList = DB::select("
             SET NOCOUNT ON;
-            EXEC dbo.cboDokterSpPK_SP
+            EXEC dbo.cboAlat_SP
         ");
 
-        $spLabList = DB::select("
+        $spRadList = DB::select("
             SET NOCOUNT ON;
-            EXEC dbo.cboSPLabNew_SP ?
+            EXEC dbo.cboSPRadNew_SP ?
         ", [
             $pasien->RegNum
         ]);
-
-        $spPaList = DB::select("
+    
+        // ============================================================
+        // UPX
+        // ============================================================
+    
+        $upxList = DB::select("
             SET NOCOUNT ON;
-            EXEC dbo.cboSPLabPA_SP
+            EXEC dbo.cboUpx_sp
         ");
-
-        //Get Upx
-        $upxList = DB::select("EXEC dbo.cboUpx_sp");
-            
-        return view('rawatinap.inapdetail', compact(
-            'pasien',
-            'lab',
-            'labDetail',
-            'lainlain',
-            'dokterList',
-            'dokterSpPKList',
-            'spLabList',
-            'spPaList',
-            'upxList'
-        ));
-        
+    
+    
+        return view(
+            'rawatinap.inapdetail',
+            compact(
+                'pasien',
+                'rad',
+                'radDetail',
+                'lainlain',
+                'dokterList',
+                'alatList',
+                'spRadList',
+                'upxList'
+            )
+        );
     }
 
     public function updatePxRS(Request $request, $id)
@@ -253,5 +270,59 @@ class RawatInapController extends Controller
 
             ], 500);
         }
+    }
+
+    public function printLabelTengah($id)
+    {
+        $rows = DB::select(
+            'EXEC dbo.skotlet @ID = ?',
+            [(int) $id]
+        );
+    
+        if (empty($rows)) {
+            abort(404, 'Data pasien tidak ditemukan.');
+        }
+    
+        $row = $rows[0];
+    
+        $patient = [
+            'ID' => $row->ID ?? '-',
+            'RegNum' => $row->RegNum ?? '-',
+            'Nama' => $row->Nama ?? '-',
+            'Addr' => $row->Addr ?? '-',
+            'Tanggal_Lahir' => $row->Tanggal_Lahir ?? null,
+        ];
+    
+        return view(
+            'rawatinap.label.label-tengah',
+            compact('patient')
+        );
+    }
+
+    public function printLabelSamping($id)
+    {
+        $rows = DB::select(
+            'EXEC dbo.skotlet @ID = ?',
+            [(int) $id]
+        );
+    
+        if (empty($rows)) {
+            abort(404, 'Data pasien tidak ditemukan.');
+        }
+    
+        $row = $rows[0];
+    
+        $patient = [
+            'ID' => $row->ID ?? '-',
+            'RegNum' => $row->RegNum ?? '-',
+            'Nama' => $row->Nama ?? '-',
+            'Addr' => $row->Addr ?? '-',
+            'Tanggal_Lahir' => $row->Tanggal_Lahir ?? null,
+        ];
+    
+        return view(
+            'rawatinap.label.label-samping',
+            compact('patient')
+        );
     }
 }

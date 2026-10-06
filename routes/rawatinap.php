@@ -14,3 +14,7 @@ Route::get('/{id}', [RawatInapController::class, 'detail'])
 
     // Cek Sep dan BPJS
 Route::get('/sep/detail', [RawatInapController::class, 'sepDetail'])->name('sep.detail');
+Route::get('/label-tengah/{id}',[RawatInapController::class, 'printLabelTengah']
+    )->name('label.tengah');
+Route::get('/label-samping/{id}',[RawatInapController::class, 'printLabelSamping']
+    )->name('label.samping');

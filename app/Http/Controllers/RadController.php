@@ -32,4 +32,6 @@ class RadController extends Controller
             'data' => $pasien
         ]);
     }
+
+    
 }
